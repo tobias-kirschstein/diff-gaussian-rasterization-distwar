@@ -1104,7 +1104,7 @@ void BACKWARD::render(
 
 	if (ct == 1) {
 		char * balance_threshold_str = std::getenv("BALANCE_THRESHOLD");
-		balance_threshold = 0;
+		balance_threshold = 8;
 		if (balance_threshold_str != nullptr) {
 			balance_threshold = std::atoi(balance_threshold_str);
 			assert(balance_threshold <= 32);
