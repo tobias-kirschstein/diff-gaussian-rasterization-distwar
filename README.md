@@ -4,6 +4,8 @@ Modified 3DGS rasterization engine for the paper "3D Gaussian Splatting for Real
 
 This is a submodule of a modified 3DGS repository. For detailed instruction on how to enable different DISTWAR optimization modes, please refer to the [parent repository](https://github.com/Accelsnow/gaussian-splatting-distwar).
 
+Default configuration: `BW_IMPLEMENTATION=0` &nbsp; `BALANCE_THRESHOLD=8`
+
 Citation for original [3DGS](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) paper:
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
