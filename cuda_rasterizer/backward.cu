@@ -684,7 +684,7 @@ renderCUDABW_serialized(
 			};
 
 			// DISTWAR - perform all atomic updates using serialized atomic reduction (SW-S)
-			atomred_vec(global_id, atom_ptrs, atom_vals, 9, balance_threshold);
+			atomred_vec(global_id, atom_ptrs, atom_vals, 6 + C, balance_threshold);
 		}
 	}
 }
@@ -890,7 +890,7 @@ renderCUDABW_butterfly(
                     atomicAdd(&(dL_dconic2D[global_id].w), dconicW);
                     atomicAdd(&(dL_dopacity[global_id]), dopacity);
                     for (int ch = 0; ch < C; ch++)
-					    atomicAdd(&(dL_dcolors[global_id * C + i]), dcolors[i]);
+					    atomicAdd(&(dL_dcolors[global_id * C + ch]), dcolors[ch]);
                 }
             } else if (!skip) {		// DISTWAR - SW-B condition not met, update gradients normally
                 atomicAdd(&(dL_dmean2D[global_id].x), dmeanX);
@@ -900,7 +900,7 @@ renderCUDABW_butterfly(
                 atomicAdd(&(dL_dconic2D[global_id].w), dconicW);
                 atomicAdd(&(dL_dopacity[global_id]), dopacity);
                 for (int ch = 0; ch < C; ch++)
-				    atomicAdd(&(dL_dcolors[global_id * C + i]), dcolors[i]);
+				    atomicAdd(&(dL_dcolors[global_id * C + ch]), dcolors[ch]);
             }
 		}
 	}
