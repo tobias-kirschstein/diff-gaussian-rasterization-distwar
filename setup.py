@@ -15,11 +15,11 @@ import os
 os.path.dirname(os.path.abspath(__file__))
 
 setup(
-    name="diff_gaussian_rasterization_distwar",
-    packages=['diff_gaussian_rasterization_distwar'],
+    name="diff_gaussian_rasterization_distwar_features",
+    packages=['diff_gaussian_rasterization_distwar_features'],
     ext_modules=[
         CUDAExtension(
-            name="diff_gaussian_rasterization_distwar._C",
+            name="diff_gaussian_rasterization_distwar_features._C",
             sources=[
             "cuda_rasterizer/rasterizer_impl.cu",
             "cuda_rasterizer/forward.cu",

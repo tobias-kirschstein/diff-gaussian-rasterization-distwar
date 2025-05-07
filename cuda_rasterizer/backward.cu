@@ -601,7 +601,7 @@ renderCUDABW_serialized(
 			float dconicW = -0.5f * gdy * d.y * dL_dG;
 			float dopacity = G * dL_dalpha;
 
-			float *atom_ptrs[9] = {
+			float *atom_ptrs[6 + C] = {
 				&dL_dmean2D[global_id].x,
 				&dL_dmean2D[global_id].y,
 				&dL_dconic2D[global_id].x,
@@ -610,10 +610,39 @@ renderCUDABW_serialized(
 				&dL_dopacity[global_id],
 				&dL_dcolors[global_id * C + 0],
 				&dL_dcolors[global_id * C + 1],
-				&dL_dcolors[global_id * C + 2]
+				&dL_dcolors[global_id * C + 2],
+				&dL_dcolors[global_id * C + 3],
+				&dL_dcolors[global_id * C + 4],
+				&dL_dcolors[global_id * C + 5],
+				&dL_dcolors[global_id * C + 6],
+				&dL_dcolors[global_id * C + 7],
+				&dL_dcolors[global_id * C + 8],
+				&dL_dcolors[global_id * C + 9],
+				&dL_dcolors[global_id * C + 10],
+				&dL_dcolors[global_id * C + 11],
+				&dL_dcolors[global_id * C + 12],
+				&dL_dcolors[global_id * C + 13],
+				&dL_dcolors[global_id * C + 14],
+				&dL_dcolors[global_id * C + 15],
+				&dL_dcolors[global_id * C + 16],
+				&dL_dcolors[global_id * C + 17],
+				&dL_dcolors[global_id * C + 18],
+				&dL_dcolors[global_id * C + 19],
+				&dL_dcolors[global_id * C + 20],
+				&dL_dcolors[global_id * C + 21],
+				&dL_dcolors[global_id * C + 22],
+				&dL_dcolors[global_id * C + 23],
+				&dL_dcolors[global_id * C + 24],
+				&dL_dcolors[global_id * C + 25],
+				&dL_dcolors[global_id * C + 26],
+				&dL_dcolors[global_id * C + 27],
+				&dL_dcolors[global_id * C + 28],
+				&dL_dcolors[global_id * C + 29],
+				&dL_dcolors[global_id * C + 30],
+				&dL_dcolors[global_id * C + 31]
 			};
 
-			float atom_vals[9] = {
+			float atom_vals[6 + C] = {
 				dmeanX,
 				dmeanY,
 				dconicX,
@@ -622,7 +651,36 @@ renderCUDABW_serialized(
 				dopacity,
 				dcolors[0],
 				dcolors[1],
-				dcolors[2]
+				dcolors[2],
+				dcolors[3],
+				dcolors[4],
+				dcolors[5],
+				dcolors[6],
+				dcolors[7],
+				dcolors[8],
+				dcolors[9],
+				dcolors[10],
+				dcolors[11],
+				dcolors[12],
+				dcolors[13],
+				dcolors[14],
+				dcolors[15],
+				dcolors[16],
+				dcolors[17],
+				dcolors[18],
+				dcolors[19],
+				dcolors[20],
+				dcolors[21],
+				dcolors[22],
+				dcolors[23],
+				dcolors[24],
+				dcolors[25],
+				dcolors[26],
+				dcolors[27],
+				dcolors[28],
+				dcolors[29],
+				dcolors[30],
+				dcolors[31]
 			};
 
 			// DISTWAR - perform all atomic updates using serialized atomic reduction (SW-S)
@@ -819,9 +877,8 @@ renderCUDABW_butterfly(
                     dconicY += __shfl_down_sync(0xFFFFFFFF, dconicY, offset);
                     dconicW += __shfl_down_sync(0xFFFFFFFF, dconicW, offset);
                     dopacity += __shfl_down_sync(0xFFFFFFFF, dopacity, offset);
-					dcolors[0] += __shfl_down_sync(0xFFFFFFFF, dcolors[0], offset);
-					dcolors[1] += __shfl_down_sync(0xFFFFFFFF, dcolors[1], offset);
-					dcolors[2] += __shfl_down_sync(0xFFFFFFFF, dcolors[2], offset);
+                    for (int ch = 0; ch < C; ch++)
+			            dcolors[ch]  += __shfl_down_sync(0xFFFFFFFF, dcolors[ch], offset);
                 }
 
 				// DISTWAR - thread 0 sends the reduced gradient updates with atomicAdd
@@ -832,9 +889,8 @@ renderCUDABW_butterfly(
                     atomicAdd(&(dL_dconic2D[global_id].y), dconicY);
                     atomicAdd(&(dL_dconic2D[global_id].w), dconicW);
                     atomicAdd(&(dL_dopacity[global_id]), dopacity);
-					atomicAdd(&(dL_dcolors[global_id * C + 0]), dcolors[0]);
-					atomicAdd(&(dL_dcolors[global_id * C + 1]), dcolors[1]);
-					atomicAdd(&(dL_dcolors[global_id * C + 2]), dcolors[2]);
+                    for (int ch = 0; ch < C; ch++)
+					    atomicAdd(&(dL_dcolors[global_id * C + i]), dcolors[i]);
                 }
             } else if (!skip) {		// DISTWAR - SW-B condition not met, update gradients normally
                 atomicAdd(&(dL_dmean2D[global_id].x), dmeanX);
@@ -843,9 +899,8 @@ renderCUDABW_butterfly(
                 atomicAdd(&(dL_dconic2D[global_id].y), dconicY);
                 atomicAdd(&(dL_dconic2D[global_id].w), dconicW);
                 atomicAdd(&(dL_dopacity[global_id]), dopacity);
-				atomicAdd(&(dL_dcolors[global_id * C + 0]), dcolors[0]);
-				atomicAdd(&(dL_dcolors[global_id * C + 1]), dcolors[1]);
-				atomicAdd(&(dL_dcolors[global_id * C + 2]), dcolors[2]);
+                for (int ch = 0; ch < C; ch++)
+				    atomicAdd(&(dL_dcolors[global_id * C + i]), dcolors[i]);
             }
 		}
 	}
